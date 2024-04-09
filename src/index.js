@@ -1,17 +1,39 @@
-const express = require("express");
-require("dotenv").config();
-const app = express();
+import dotenv from "dotenv";
+import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
-// const port = 4000;
-
-app.get("/", (req, res) => {
-  res.send("Hello World");
+dotenv.config({
+  path: "./env",
 });
 
-app.get("/login", (req, res) => {
-  res.send("Plz Login");
-});
+// in async method always write then and catch
+connectDB()
+  .then(() => {
+    app.listen(process.env.PORT || 8000, () => {
+      console.log(`Server is running on : ${process.env.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log("MONGODB connection failed", err);
+  });
 
-app.listen(process.env.PORT, () => {
-  console.log(`app is listening on ${process.env.port}`);
-});
+/*
+const app = express()(
+  // always connect database in async await and in try catch
+  async () => {
+    try {
+      await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`);
+      app.on("error", (error) => {
+        console.log("ERR", error);
+        throw error;
+      });
+
+      app.listen(process.env.PORT, () => {
+        console.log(`process is listening on ${process.env.PORT}`);
+      });
+    } catch (error) {
+      console.error("ERROR", error);
+    }
+  }
+)();
+*/
